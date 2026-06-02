@@ -199,7 +199,6 @@ def run_scan():
                 if ticker not in ticker_snippet:
                     ticker_snippet[ticker] = extract_snippet(combined_text, ticker)
 
-            time.sleep(0.05)
 
     results = []
     for rank, (ticker, score) in enumerate(ticker_score.most_common(TOP_N), 1):
@@ -219,6 +218,7 @@ def run_scan():
         "total_comments": total_comments,
         "hours_back":     HOURS_BACK,
         "scanned_at":     datetime.now().strftime("%Y-%m-%d %H:%M UTC"),
+        "debug":          f"scored tickers: {len(ticker_score)}, top5: {ticker_score.most_common(5)}",
     }
 
 
@@ -242,17 +242,6 @@ def api_scan():
 # ─────────────────────────────────────────────
 #  ENTRY POINT
 # ─────────────────────────────────────────────
-@app.route("/api/test")
-def api_test():
-    try:
-        r = requests.get(
-            f"{ARCTIC}/posts/search",
-            params={"subreddit": "stocks", "limit": 3},
-            headers=HEADERS,
-            timeout=10
-        )
-        return jsonify({"status": r.status_code, "body": r.text[:300]})
-    except Exception as e:
-        return jsonify({"error": str(e)})
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
