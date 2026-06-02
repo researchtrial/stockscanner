@@ -242,6 +242,17 @@ def api_scan():
 # ─────────────────────────────────────────────
 #  ENTRY POINT
 # ─────────────────────────────────────────────
-
+@app.route("/api/test")
+def api_test():
+    try:
+        r = requests.get(
+            f"{ARCTIC}/posts/search",
+            params={"subreddit": "stocks", "limit": 3},
+            headers=HEADERS,
+            timeout=10
+        )
+        return jsonify({"status": r.status_code, "body": r.text[:300]})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
