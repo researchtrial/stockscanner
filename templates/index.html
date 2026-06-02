@@ -1,3 +1,4 @@
+cat > /mnt/user-data/outputs/MarketScanner/templates/index.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -144,27 +145,63 @@
   .card-top {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     padding: 14px 14px 8px;
   }
 
-  .rank {
-    font-size: 10px;
-    color: var(--muted);
-    width: 18px;
+  .company-logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--border);
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--muted);
+  }
+
+  .company-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 4px;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .ticker-block { flex: 1; min-width: 0; }
+
+  .rank {
+    font-size: 9px;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 1px;
   }
 
   .ticker {
     font-family: 'Syne', sans-serif;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 800;
     color: var(--white);
-    flex: 1;
     letter-spacing: -0.5px;
+    line-height: 1;
   }
 
-  .score-box { text-align: right; }
+  .company-name {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .score-box { text-align: right; flex-shrink: 0; }
 
   .score-num {
     font-size: 20px;
@@ -181,7 +218,7 @@
     text-transform: uppercase;
   }
 
-  .momentum-wrap { padding: 0 14px 10px 42px; }
+  .momentum-wrap { padding: 0 14px 10px 62px; }
 
   .momentum-track {
     background: var(--border);
@@ -198,7 +235,7 @@
   }
 
   .card-meta {
-    padding: 0 14px 10px 42px;
+    padding: 0 14px 10px 62px;
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
@@ -223,7 +260,7 @@
   }
 
   .snippet {
-    padding: 8px 14px 10px 42px;
+    padding: 8px 14px 10px 62px;
     color: #6a8a9a;
     font-size: 11px;
     line-height: 1.6;
@@ -284,6 +321,95 @@
 <footer>NFA · for research only · data via Arctic Shift / Reddit</footer>
 
 <script>
+// Ticker → [domain, company name]
+const COMPANY_MAP = {
+  AAPL:  ['apple.com',          'Apple'],
+  MSFT:  ['microsoft.com',      'Microsoft'],
+  GOOGL: ['google.com',         'Alphabet'],
+  GOOG:  ['google.com',         'Alphabet'],
+  AMZN:  ['amazon.com',         'Amazon'],
+  NVDA:  ['nvidia.com',         'NVIDIA'],
+  META:  ['meta.com',           'Meta'],
+  TSLA:  ['tesla.com',          'Tesla'],
+  AVGO:  ['broadcom.com',       'Broadcom'],
+  TSM:   ['tsmc.com',           'TSMC'],
+  ORCL:  ['oracle.com',         'Oracle'],
+  ASML:  ['asml.com',           'ASML'],
+  AMD:   ['amd.com',            'AMD'],
+  QCOM:  ['qualcomm.com',       'Qualcomm'],
+  INTC:  ['intel.com',          'Intel'],
+  AMAT:  ['appliedmaterials.com','Applied Materials'],
+  MU:    ['micron.com',         'Micron'],
+  ARM:   ['arm.com',            'ARM'],
+  SMCI:  ['supermicro.com',     'Super Micro'],
+  MRVL:  ['marvell.com',        'Marvell'],
+  JPM:   ['jpmorganchase.com',  'JPMorgan Chase'],
+  BAC:   ['bankofamerica.com',  'Bank of America'],
+  GS:    ['goldmansachs.com',   'Goldman Sachs'],
+  MS:    ['morganstanley.com',  'Morgan Stanley'],
+  WFC:   ['wellsfargo.com',     'Wells Fargo'],
+  V:     ['visa.com',           'Visa'],
+  MA:    ['mastercard.com',     'Mastercard'],
+  PYPL:  ['paypal.com',         'PayPal'],
+  BRK:   ['berkshirehathaway.com','Berkshire Hathaway'],
+  UNH:   ['unitedhealthgroup.com','UnitedHealth'],
+  JNJ:   ['jnj.com',           'Johnson & Johnson'],
+  LLY:   ['lilly.com',         'Eli Lilly'],
+  PFE:   ['pfizer.com',        'Pfizer'],
+  ABBV:  ['abbvie.com',        'AbbVie'],
+  MRK:   ['merck.com',         'Merck'],
+  XOM:   ['exxonmobil.com',    'ExxonMobil'],
+  CVX:   ['chevron.com',       'Chevron'],
+  COP:   ['conocophillips.com','ConocoPhillips'],
+  WMT:   ['walmart.com',       'Walmart'],
+  COST:  ['costco.com',        'Costco'],
+  AMGN:  ['amgen.com',         'Amgen'],
+  NFLX:  ['netflix.com',       'Netflix'],
+  DIS:   ['disney.com',        'Disney'],
+  CRM:   ['salesforce.com',    'Salesforce'],
+  ADBE:  ['adobe.com',         'Adobe'],
+  NOW:   ['servicenow.com',    'ServiceNow'],
+  PLTR:  ['palantir.com',      'Palantir'],
+  SNOW:  ['snowflake.com',     'Snowflake'],
+  UBER:  ['uber.com',          'Uber'],
+  ABNB:  ['airbnb.com',        'Airbnb'],
+  SHOP:  ['shopify.com',       'Shopify'],
+  SQ:    ['squareup.com',      'Block'],
+  COIN:  ['coinbase.com',      'Coinbase'],
+  HOOD:  ['robinhood.com',     'Robinhood'],
+  BA:    ['boeing.com',        'Boeing'],
+  CAT:   ['caterpillar.com',   'Caterpillar'],
+  DE:    ['deere.com',         'John Deere'],
+  GE:    ['ge.com',            'GE'],
+  F:     ['ford.com',          'Ford'],
+  GM:    ['gm.com',            'General Motors'],
+  RIVN:  ['rivian.com',        'Rivian'],
+  LCID:  ['lucidmotors.com',   'Lucid Motors'],
+  NIO:   ['nio.com',           'NIO'],
+  BABA:  ['alibaba.com',       'Alibaba'],
+  JD:    ['jd.com',            'JD.com'],
+  PDD:   ['pinduoduo.com',     'PDD Holdings'],
+  TCEHY: ['tencent.com',       'Tencent'],
+  SPY:   ['ssga.com',          'S&P 500 ETF'],
+  QQQ:   ['invesco.com',       'Nasdaq ETF'],
+  IWM:   ['ishares.com',       'Russell 2000 ETF'],
+};
+
+function getLogoHTML(ticker) {
+  const info = COMPANY_MAP[ticker];
+  if (info) {
+    const [domain, name] = info;
+    return {
+      html: `<div class="company-logo"><img src="https://logo.clearbit.com/${domain}" alt="${ticker}" onerror="this.parentElement.textContent='${ticker.slice(0,3)}'"></div>`,
+      name: name
+    };
+  }
+  return {
+    html: `<div class="company-logo">${ticker.slice(0, 3)}</div>`,
+    name: ''
+  };
+}
+
 async function startScan() {
   const btn    = document.getElementById('scanBtn');
   const prog   = document.getElementById('progress');
@@ -332,16 +458,22 @@ function renderBoard(results) {
   let html = `<div class="board-header">Bullish Momentum · Top ${results.length} · Last 24h</div>`;
 
   results.forEach((item, i) => {
-    const pct     = Math.round((item.score / maxScore) * 100);
-    const sources = item.sources.map(s => `<span class="source-tag">r/${s}</span>`).join('');
-    const snippet = item.snippet ? `<div class="snippet">"${item.snippet}"</div>` : '';
-    const link    = item.link ? `<a class="card-link" href="${item.link}" target="_blank">View Reddit thread</a>` : '';
+    const pct          = Math.round((item.score / maxScore) * 100);
+    const { html: logoHTML, name: companyName } = getLogoHTML(item.ticker);
+    const sources      = item.sources.map(s => `<span class="source-tag">r/${s}</span>`).join('');
+    const snippet      = item.snippet ? `<div class="snippet">"${item.snippet}"</div>` : '';
+    const link         = item.link ? `<a class="card-link" href="${item.link}" target="_blank">View Reddit thread</a>` : '';
+    const nameHTML     = companyName ? `<div class="company-name">${companyName}</div>` : '';
 
     html += `
       <div class="card" style="animation-delay:${i * 60}ms">
         <div class="card-top">
-          <div class="rank">#${item.rank}</div>
-          <div class="ticker">$${item.ticker}</div>
+          ${logoHTML}
+          <div class="ticker-block">
+            <span class="rank">#${item.rank}</span>
+            <div class="ticker">$${item.ticker}</div>
+            ${nameHTML}
+          </div>
           <div class="score-box">
             <span class="score-num">${item.score}</span>
             <span class="score-label">score</span>
