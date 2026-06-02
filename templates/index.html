@@ -9,6 +9,7 @@
   :root {
     --bg:        #080c10;
     --surface:   #0e1419;
+    --surface2:  #111820;
     --border:    #1c2530;
     --green:     #00ff9d;
     --green-dim: #00c97a;
@@ -48,7 +49,6 @@
     color: var(--white);
     letter-spacing: -0.5px;
   }
-
   .logo span { color: var(--green); }
 
   .scan-btn {
@@ -63,7 +63,6 @@
     border-radius: 4px;
     transition: opacity 0.2s, transform 0.1s;
   }
-
   .scan-btn:hover   { opacity: 0.85; }
   .scan-btn:active  { transform: scale(0.97); }
   .scan-btn:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -78,224 +77,128 @@
     gap: 8px;
   }
 
-  .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--muted);
-    flex-shrink: 0;
-  }
+  .dot { width:6px; height:6px; border-radius:50%; background:var(--muted); flex-shrink:0; }
+  .dot.live { background:var(--green); box-shadow:0 0 6px var(--green); }
 
-  .dot.live {
-    background: var(--green);
-    box-shadow: 0 0 6px var(--green);
-  }
-
-  #progress {
-    display: none;
-    padding: 48px 16px;
-    text-align: center;
-  }
+  #progress { display:none; padding:48px 16px; text-align:center; }
 
   .spinner {
-    width: 32px; height: 32px;
-    border: 2px solid var(--border);
-    border-top-color: var(--green);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 16px;
+    width:32px; height:32px;
+    border:2px solid var(--border);
+    border-top-color:var(--green);
+    border-radius:50%;
+    animation:spin 0.8s linear infinite;
+    margin:0 auto 16px;
   }
 
-  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes spin { to { transform:rotate(360deg); } }
 
-  .progress-text {
-    color: var(--green);
-    font-size: 11px;
-    animation: pulse 1.2s ease-in-out infinite;
-  }
-
+  .progress-text { color:var(--green); font-size:11px; animation:pulse 1.2s ease-in-out infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-  #board { padding: 12px 16px; }
+  #board { padding:12px 16px; }
 
   .board-header {
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    text-transform: uppercase;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 10px;
+    font-size:10px; letter-spacing:2px; color:var(--muted);
+    text-transform:uppercase; padding-bottom:10px;
+    border-bottom:1px solid var(--border); margin-bottom:10px;
   }
 
+  /* ── CARD ── */
   .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    margin-bottom: 10px;
-    overflow: hidden;
-    animation: fadeUp 0.3s ease both;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin-bottom:10px;
+    overflow:hidden;
+    animation:fadeUp 0.3s ease both;
   }
-
-  @keyframes fadeUp {
-    from { opacity:0; transform:translateY(8px); }
-    to   { opacity:1; transform:translateY(0); }
-  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
   .card-top {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 14px 8px;
+    display:flex; align-items:center; gap:12px;
+    padding:14px 14px 10px;
   }
 
+  /* Logo */
   .company-logo {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background: var(--border);
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    font-family: 'Syne', sans-serif;
-    font-size: 11px;
-    font-weight: 800;
-    color: var(--muted);
+    width:40px; height:40px; border-radius:8px;
+    background:#fff; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden; font-family:'Syne',sans-serif;
+    font-size:10px; font-weight:800; color:#333;
+  }
+  .company-logo img { width:100%; height:100%; object-fit:contain; padding:4px; }
+  .company-logo.fallback { background:var(--border); color:var(--muted); }
+
+  .ticker-block { flex:1; min-width:0; }
+  .rank { font-size:9px; color:var(--muted); display:block; margin-bottom:1px; }
+  .ticker { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--white); letter-spacing:-0.5px; line-height:1; }
+  .company-name { font-size:10px; color:var(--muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  .score-box { text-align:right; flex-shrink:0; }
+  .score-num { font-size:20px; font-weight:600; color:var(--green); display:block; line-height:1; }
+  .score-label { font-size:9px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+
+  .momentum-wrap { padding:0 14px 10px 66px; }
+  .momentum-track { background:var(--border); border-radius:2px; height:3px; overflow:hidden; }
+  .momentum-fill { height:100%; background:linear-gradient(90deg,var(--green-dim),var(--green)); border-radius:2px; transition:width 0.6s ease; }
+
+  .card-meta { padding:0 14px 10px 66px; display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+  .mentions-badge { background:#0e2a1f; color:var(--green-dim); padding:2px 8px; border-radius:3px; font-size:10px; border:1px solid #1a4030; }
+  .source-tag { color:var(--muted); font-size:10px; background:var(--border); padding:2px 6px; border-radius:3px; }
+
+  /* ── THREADS SECTION ── */
+  .threads-toggle {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 14px;
+    border-top:1px solid var(--border);
+    cursor:pointer;
+    font-size:11px;
+    color:var(--muted);
+    user-select:none;
+    transition:background 0.15s;
+  }
+  .threads-toggle:hover { background:#0c1520; }
+  .threads-toggle .arrow { font-size:10px; transition:transform 0.2s; }
+  .threads-toggle.open .arrow { transform:rotate(180deg); }
+
+  .threads-list { display:none; }
+  .threads-list.open { display:block; }
+
+  .thread-item {
+    padding:10px 14px 10px 14px;
+    border-top:1px solid var(--border);
+    background:var(--surface2);
   }
 
-  .company-logo img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    padding: 4px;
-    border-radius: 8px;
-    background: #fff;
+  .thread-title {
+    display:block;
+    color:var(--amber);
+    text-decoration:none;
+    font-size:11px;
+    line-height:1.5;
+    margin-bottom:4px;
+  }
+  .thread-title:hover { text-decoration:underline; }
+
+  .thread-meta {
+    font-size:10px;
+    color:var(--muted);
+    margin-bottom:4px;
   }
 
-  .ticker-block { flex: 1; min-width: 0; }
-
-  .rank {
-    font-size: 9px;
-    color: var(--muted);
-    display: block;
-    margin-bottom: 1px;
+  .thread-snippet {
+    font-size:10px;
+    color:#567080;
+    line-height:1.5;
+    font-style:italic;
   }
 
-  .ticker {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--white);
-    letter-spacing: -0.5px;
-    line-height: 1;
-  }
+  .empty { text-align:center; padding:48px 16px; color:var(--muted); }
+  .empty-icon { font-size:32px; margin-bottom:12px; }
 
-  .company-name {
-    font-size: 10px;
-    color: var(--muted);
-    margin-top: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .score-box { text-align: right; flex-shrink: 0; }
-
-  .score-num {
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--green);
-    display: block;
-    line-height: 1;
-  }
-
-  .score-label {
-    font-size: 9px;
-    color: var(--muted);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  .momentum-wrap { padding: 0 14px 10px 62px; }
-
-  .momentum-track {
-    background: var(--border);
-    border-radius: 2px;
-    height: 3px;
-    overflow: hidden;
-  }
-
-  .momentum-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--green-dim), var(--green));
-    border-radius: 2px;
-    transition: width 0.6s ease;
-  }
-
-  .card-meta {
-    padding: 0 14px 10px 62px;
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
-  .mentions-badge {
-    background: #0e2a1f;
-    color: var(--green-dim);
-    padding: 2px 8px;
-    border-radius: 3px;
-    font-size: 10px;
-    border: 1px solid #1a4030;
-  }
-
-  .source-tag {
-    color: var(--muted);
-    font-size: 10px;
-    background: var(--border);
-    padding: 2px 6px;
-    border-radius: 3px;
-  }
-
-  .snippet {
-    padding: 8px 14px 10px 62px;
-    color: #6a8a9a;
-    font-size: 11px;
-    line-height: 1.6;
-    border-top: 1px solid var(--border);
-  }
-
-  .card-link {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 9px 14px;
-    background: #0a1520;
-    border-top: 1px solid var(--border);
-    color: var(--amber);
-    text-decoration: none;
-    font-size: 11px;
-    transition: background 0.15s;
-  }
-
-  .card-link:hover { background: #0f1e2d; }
-  .card-link::before { content: "→  "; }
-
-  .empty {
-    text-align: center;
-    padding: 48px 16px;
-    color: var(--muted);
-  }
-
-  .empty-icon { font-size: 32px; margin-bottom: 12px; }
-
-  footer {
-    text-align: center;
-    padding: 24px 16px 0;
-    font-size: 10px;
-    color: var(--muted);
-  }
+  footer { text-align:center; padding:24px 16px 0; font-size:10px; color:var(--muted); }
 </style>
 </head>
 <body>
@@ -322,91 +225,59 @@
 <script>
 // Ticker → [domain, company name]
 const COMPANY_MAP = {
-  AAPL:  ['apple.com',          'Apple'],
-  MSFT:  ['microsoft.com',      'Microsoft'],
-  GOOGL: ['google.com',         'Alphabet'],
-  GOOG:  ['google.com',         'Alphabet'],
-  AMZN:  ['amazon.com',         'Amazon'],
-  NVDA:  ['nvidia.com',         'NVIDIA'],
-  META:  ['meta.com',           'Meta'],
-  TSLA:  ['tesla.com',          'Tesla'],
-  AVGO:  ['broadcom.com',       'Broadcom'],
-  TSM:   ['tsmc.com',           'TSMC'],
-  ORCL:  ['oracle.com',         'Oracle'],
-  ASML:  ['asml.com',           'ASML'],
-  AMD:   ['amd.com',            'AMD'],
-  QCOM:  ['qualcomm.com',       'Qualcomm'],
-  INTC:  ['intel.com',          'Intel'],
-  AMAT:  ['appliedmaterials.com','Applied Materials'],
-  MU:    ['micron.com',         'Micron'],
-  ARM:   ['arm.com',            'ARM'],
-  SMCI:  ['supermicro.com',     'Super Micro'],
-  MRVL:  ['marvell.com',        'Marvell'],
-  JPM:   ['jpmorganchase.com',  'JPMorgan Chase'],
-  BAC:   ['bankofamerica.com',  'Bank of America'],
-  GS:    ['goldmansachs.com',   'Goldman Sachs'],
-  MS:    ['morganstanley.com',  'Morgan Stanley'],
-  WFC:   ['wellsfargo.com',     'Wells Fargo'],
-  V:     ['visa.com',           'Visa'],
-  MA:    ['mastercard.com',     'Mastercard'],
-  PYPL:  ['paypal.com',         'PayPal'],
-  BRK:   ['berkshirehathaway.com','Berkshire Hathaway'],
-  UNH:   ['unitedhealthgroup.com','UnitedHealth'],
-  JNJ:   ['jnj.com',           'Johnson & Johnson'],
-  LLY:   ['lilly.com',         'Eli Lilly'],
-  PFE:   ['pfizer.com',        'Pfizer'],
-  ABBV:  ['abbvie.com',        'AbbVie'],
-  MRK:   ['merck.com',         'Merck'],
-  XOM:   ['exxonmobil.com',    'ExxonMobil'],
-  CVX:   ['chevron.com',       'Chevron'],
-  COP:   ['conocophillips.com','ConocoPhillips'],
-  WMT:   ['walmart.com',       'Walmart'],
-  COST:  ['costco.com',        'Costco'],
-  AMGN:  ['amgen.com',         'Amgen'],
-  NFLX:  ['netflix.com',       'Netflix'],
-  DIS:   ['disney.com',        'Disney'],
-  CRM:   ['salesforce.com',    'Salesforce'],
-  ADBE:  ['adobe.com',         'Adobe'],
-  NOW:   ['servicenow.com',    'ServiceNow'],
-  PLTR:  ['palantir.com',      'Palantir'],
-  SNOW:  ['snowflake.com',     'Snowflake'],
-  UBER:  ['uber.com',          'Uber'],
-  ABNB:  ['airbnb.com',        'Airbnb'],
-  SHOP:  ['shopify.com',       'Shopify'],
-  SQ:    ['squareup.com',      'Block'],
-  COIN:  ['coinbase.com',      'Coinbase'],
-  HOOD:  ['robinhood.com',     'Robinhood'],
-  BA:    ['boeing.com',        'Boeing'],
-  CAT:   ['caterpillar.com',   'Caterpillar'],
-  DE:    ['deere.com',         'John Deere'],
-  GE:    ['ge.com',            'GE'],
-  F:     ['ford.com',          'Ford'],
-  GM:    ['gm.com',            'General Motors'],
-  RIVN:  ['rivian.com',        'Rivian'],
-  LCID:  ['lucidmotors.com',   'Lucid Motors'],
-  NIO:   ['nio.com',           'NIO'],
-  BABA:  ['alibaba.com',       'Alibaba'],
-  JD:    ['jd.com',            'JD.com'],
-  PDD:   ['pinduoduo.com',     'PDD Holdings'],
-  TCEHY: ['tencent.com',       'Tencent'],
-  SPY:   ['ssga.com',          'S&P 500 ETF'],
-  QQQ:   ['invesco.com',       'Nasdaq ETF'],
-  IWM:   ['ishares.com',       'Russell 2000 ETF'],
+  AAPL:['apple.com','Apple'],           MSFT:['microsoft.com','Microsoft'],
+  GOOGL:['google.com','Alphabet'],      GOOG:['google.com','Alphabet'],
+  AMZN:['amazon.com','Amazon'],         NVDA:['nvidia.com','NVIDIA'],
+  META:['meta.com','Meta'],             TSLA:['tesla.com','Tesla'],
+  AVGO:['broadcom.com','Broadcom'],     TSM:['tsmc.com','TSMC'],
+  ORCL:['oracle.com','Oracle'],         ASML:['asml.com','ASML'],
+  AMD:['amd.com','AMD'],                QCOM:['qualcomm.com','Qualcomm'],
+  INTC:['intel.com','Intel'],           AMAT:['appliedmaterials.com','Applied Materials'],
+  MU:['micron.com','Micron'],           ARM:['arm.com','ARM'],
+  SMCI:['supermicro.com','Super Micro'],MRVL:['marvell.com','Marvell'],
+  KLAC:['kla.com','KLA'],               LRCX:['lamresearch.com','Lam Research'],
+  JPM:['jpmorganchase.com','JPMorgan'], BAC:['bankofamerica.com','Bank of America'],
+  GS:['goldmansachs.com','Goldman'],    MS:['morganstanley.com','Morgan Stanley'],
+  WFC:['wellsfargo.com','Wells Fargo'], V:['visa.com','Visa'],
+  MA:['mastercard.com','Mastercard'],   PYPL:['paypal.com','PayPal'],
+  BRK:['berkshirehathaway.com','Berkshire'],
+  UNH:['unitedhealthgroup.com','UnitedHealth'],
+  JNJ:['jnj.com','J&J'],               LLY:['lilly.com','Eli Lilly'],
+  PFE:['pfizer.com','Pfizer'],          ABBV:['abbvie.com','AbbVie'],
+  MRK:['merck.com','Merck'],            XOM:['exxonmobil.com','ExxonMobil'],
+  CVX:['chevron.com','Chevron'],        COP:['conocophillips.com','ConocoPhillips'],
+  WMT:['walmart.com','Walmart'],        COST:['costco.com','Costco'],
+  AMGN:['amgen.com','Amgen'],           NFLX:['netflix.com','Netflix'],
+  DIS:['disney.com','Disney'],          CRM:['salesforce.com','Salesforce'],
+  ADBE:['adobe.com','Adobe'],           NOW:['servicenow.com','ServiceNow'],
+  PLTR:['palantir.com','Palantir'],     SNOW:['snowflake.com','Snowflake'],
+  UBER:['uber.com','Uber'],             ABNB:['airbnb.com','Airbnb'],
+  SHOP:['shopify.com','Shopify'],       COIN:['coinbase.com','Coinbase'],
+  BA:['boeing.com','Boeing'],           CAT:['caterpillar.com','Caterpillar'],
+  GE:['ge.com','GE'],                   F:['ford.com','Ford'],
+  GM:['gm.com','General Motors'],       RIVN:['rivian.com','Rivian'],
+  NIO:['nio.com','NIO'],                BABA:['alibaba.com','Alibaba'],
+  NFLX:['netflix.com','Netflix'],       SPOT:['spotify.com','Spotify'],
+  HOOD:['robinhood.com','Robinhood'],   SQ:['squareup.com','Block'],
+  SPY:['ssga.com','S&P 500 ETF'],       QQQ:['invesco.com','Nasdaq ETF'],
 };
 
-function getLogoHTML(ticker) {
+function getLogo(ticker) {
   const info = COMPANY_MAP[ticker];
   if (info) {
     const [domain, name] = info;
-    return {
-      html: `<div class="company-logo"><img src="https://logo.clearbit.com/${domain}" alt="${ticker}" onerror="this.parentElement.textContent='${ticker.slice(0,3)}'"></div>`,
-      name: name
-    };
+    // Use logo.dev — more reliable than Clearbit
+    const src = `https://img.logo.dev/${domain}?token=pk_X8dRQCCkT0KAqEVi4fCSmA`;
+    return { logoHTML: `<div class="company-logo"><img src="${src}" alt="${ticker}" onerror="this.parentElement.className='company-logo fallback';this.parentElement.textContent='${ticker.slice(0,3)}'"></div>`, name };
   }
-  return {
-    html: `<div class="company-logo">${ticker.slice(0, 3)}</div>`,
-    name: ''
-  };
+  return { logoHTML: `<div class="company-logo fallback">${ticker.slice(0,3)}</div>`, name: '' };
+}
+
+function toggleThreads(id) {
+  const btn  = document.getElementById('toggle-' + id);
+  const list = document.getElementById('threads-' + id);
+  const open = list.classList.toggle('open');
+  btn.classList.toggle('open', open);
 }
 
 async function startScan() {
@@ -416,32 +287,31 @@ async function startScan() {
   const dot    = document.getElementById('statusDot');
   const status = document.getElementById('statusText');
 
-  btn.disabled    = true;
+  btn.disabled = true;
   btn.textContent = '⏳ Scanning…';
   prog.style.display = 'block';
-  board.innerHTML    = '';
-  dot.className      = 'dot';
+  board.innerHTML = '';
+  dot.className = 'dot';
   status.textContent = 'Scanning Reddit — please wait…';
 
   try {
     const res  = await fetch('/api/scan');
     const data = await res.json();
-
     if (data.error) throw new Error(data.error);
 
-    prog.style.display  = 'none';
-    btn.disabled        = false;
-    btn.textContent     = '▶ RUN SCAN';
-    dot.className       = 'dot live';
-    status.textContent  = `${data.scanned_at} · ${data.total_posts} posts · ${data.total_comments} comments · last ${data.hours_back}h`;
+    prog.style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = '▶ RUN SCAN';
+    dot.className = 'dot live';
+    status.textContent = `${data.scanned_at} · ${data.total_posts} posts · ${data.total_comments} comments · last ${data.hours_back}h`;
 
     renderBoard(data.results);
   } catch(e) {
-    prog.style.display  = 'none';
-    btn.disabled        = false;
-    btn.textContent     = '▶ RUN SCAN';
-    status.textContent  = 'Error — try again';
-    board.innerHTML     = `<div class="empty"><div class="empty-icon">⚠️</div>${e.message || 'Scan failed. Try again.'}</div>`;
+    prog.style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = '▶ RUN SCAN';
+    status.textContent = 'Error — try again';
+    board.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>${e.message || 'Scan failed.'}</div>`;
   }
 }
 
@@ -457,12 +327,31 @@ function renderBoard(results) {
   let html = `<div class="board-header">Bullish Momentum · Top ${results.length} · Last 24h</div>`;
 
   results.forEach((item, i) => {
-    const pct          = Math.round((item.score / maxScore) * 100);
-    const { html: logoHTML, name: companyName } = getLogoHTML(item.ticker);
-    const sources      = item.sources.map(s => `<span class="source-tag">r/${s}</span>`).join('');
-    const snippet      = item.snippet ? `<div class="snippet">"${item.snippet}"</div>` : '';
-    const link         = item.link ? `<a class="card-link" href="${item.link}" target="_blank">View Reddit thread</a>` : '';
-    const nameHTML     = companyName ? `<div class="company-name">${companyName}</div>` : '';
+    const pct              = Math.round((item.score / maxScore) * 100);
+    const { logoHTML, name } = getLogo(item.ticker);
+    const sources          = item.sources.map(s => `<span class="source-tag">r/${s}</span>`).join('');
+    const nameHTML         = name ? `<div class="company-name">${name}</div>` : '';
+    const threadCount      = item.threads ? item.threads.length : 0;
+
+    // Build thread list HTML
+    let threadsHTML = '';
+    if (threadCount > 0) {
+      const threadItems = item.threads.map(t => `
+        <div class="thread-item">
+          <a class="thread-title" href="${t.url}" target="_blank">${t.title}</a>
+          <div class="thread-meta">r/${t.sub}</div>
+          ${t.snippet ? `<div class="thread-snippet">"${t.snippet}"</div>` : ''}
+        </div>`).join('');
+
+      threadsHTML = `
+        <div class="threads-toggle" id="toggle-${i}" onclick="toggleThreads(${i})">
+          <span>📋 ${threadCount} thread${threadCount !== 1 ? 's' : ''} mentioning $${item.ticker}</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="threads-list" id="threads-${i}">
+          ${threadItems}
+        </div>`;
+    }
 
     html += `
       <div class="card" style="animation-delay:${i * 60}ms">
@@ -487,8 +376,7 @@ function renderBoard(results) {
           <span class="mentions-badge">${item.mentions} mention${item.mentions !== 1 ? 's' : ''}</span>
           ${sources}
         </div>
-        ${snippet}
-        ${link}
+        ${threadsHTML}
       </div>`;
   });
 
