@@ -1,6 +1,5 @@
 import requests
 import re
-import time
 from collections import Counter, defaultdict
 from datetime import datetime, timezone, timedelta
 from flask import Flask, jsonify, render_template
@@ -107,7 +106,7 @@ def score_text(text):
     lower = text.lower()
     return sum(w for kw, w in BULLISH_KEYWORDS.items() if kw in lower)
 
-def extract_snippet(text, ticker, max_len=140):
+def extract_snippet(text, ticker, max_len=160):
     for sentence in text.split("."):
         if ticker in sentence and len(sentence.strip()) > 15:
             s = sentence.strip().replace("\n", " ")
@@ -162,8 +161,8 @@ def run_scan():
     ticker_score   = Counter()
     ticker_mention = Counter()
     ticker_sources = defaultdict(set)
-    ticker_snippet = {}
-    ticker_link    = {}
+    # Now stores list of {title, url, snippet} per ticker
+    ticker_threads = defaultdict(list)
     total_posts    = 0
     total_comments = 0
 
@@ -194,11 +193,14 @@ def run_scan():
                 ticker_score[ticker]   += combined_score
                 ticker_mention[ticker] += 1
                 ticker_sources[ticker].add(sub)
-                if thread_url and ticker not in ticker_link:
-                    ticker_link[ticker] = thread_url
-                if ticker not in ticker_snippet:
-                    ticker_snippet[ticker] = extract_snippet(combined_text, ticker)
-
+                # Store every thread that mentions this ticker (max 8)
+                if len(ticker_threads[ticker]) < 8:
+                    ticker_threads[ticker].append({
+                        "title":   title[:100] + ("…" if len(title) > 100 else ""),
+                        "url":     thread_url,
+                        "sub":     post_sub,
+                        "snippet": extract_snippet(combined_text, ticker),
+                    })
 
     results = []
     for rank, (ticker, score) in enumerate(ticker_score.most_common(TOP_N), 1):
@@ -208,8 +210,7 @@ def run_scan():
             "score":    score,
             "mentions": ticker_mention[ticker],
             "sources":  sorted(ticker_sources[ticker]),
-            "snippet":  ticker_snippet.get(ticker, ""),
-            "link":     ticker_link.get(ticker, ""),
+            "threads":  ticker_threads.get(ticker, []),
         })
 
     return {
@@ -218,7 +219,6 @@ def run_scan():
         "total_comments": total_comments,
         "hours_back":     HOURS_BACK,
         "scanned_at":     datetime.now().strftime("%Y-%m-%d %H:%M UTC"),
-        "debug":          f"scored tickers: {len(ticker_score)}, top5: {ticker_score.most_common(5)}",
     }
 
 
@@ -237,6 +237,19 @@ def api_scan():
         return jsonify(data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route("/api/test")
+def api_test():
+    try:
+        r = requests.get(
+            f"{ARCTIC}/posts/search",
+            params={"subreddit": "stocks", "limit": 3},
+            headers=HEADERS,
+            timeout=10
+        )
+        return jsonify({"status": r.status_code, "body": r.text[:300]})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 
 # ─────────────────────────────────────────────
