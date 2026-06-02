@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Scanner</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #080c10;
+    --surface:   #0e1419;
+    --border:    #1c2530;
+    --green:     #00ff9d;
+    --green-dim: #00c97a;
+    --amber:     #ffb300;
+    --red:       #ff4757;
+    --muted:     #4a6070;
+    --text:      #c8d8e4;
+    --white:     #eef4f8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: -0.5px;
+  }
+
+  .logo span { color: var(--green); }
+
+  .scan-btn {
+    background: var(--green);
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    transition: opacity 0.2s, transform 0.1s;
+    white-space: nowrap;
+  }
+
+  .scan-btn:hover  { opacity: 0.85; }
+  .scan-btn:active { transform: scale(0.97); }
+  .scan-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── STATUS BAR ── */
+  .status-bar {
+    padding: 10px 20px;
+    font-size: 11px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .status-bar .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .status-bar .dot.live { background: var(--green); box-shadow: 0 0 6px var(--green); }
+
+  /* ── PROGRESS ── */
+  #progress {
+    display: none;
+    padding: 32px 20px;
+    text-align: center;
+  }
+
+  .spinner {
+    width: 36px; height: 36px;
+    border: 2px solid var(--border);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .progress-text {
+    color: var(--green);
+    font-size: 12px;
+    animation: blink 1.2s ease-in-out infinite;
+  }
+
+  @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+  /* ── LEADERBOARD ── */
+  #board { padding: 16px 20px; }
+
+  .board-header {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 0 0 12px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    animation: fadeUp 0.3s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(10px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px 10px;
+  }
+
+  .rank {
+    font-size: 11px;
+    color: var(--muted);
+    width: 20px;
+    flex-shrink: 0;
+  }
+
+  .ticker {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--white);
+    flex: 1;
+    letter-spacing: -0.5px;
+  }
+
+  .score-box {
+    text-align: right;
+  }
+
+  .score-num {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--green);
+    display: block;
+    line-height: 1;
+  }
+
+  .score-label {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* momentum bar */
+  .momentum-wrap {
+    padding: 0 16px 10px 48px;
+  }
+
+  .momentum-track {
+    background: var(--border);
+    border-radius: 2px;
+    height: 3px;
+    overflow: hidden;
+  }
+
+  .momentum-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green-dim), var(--green));
+    border-radius: 2px;
+    transition: width 0.6s ease;
+  }
+
+  /* meta row */
+  .card-meta {
+    padding: 0 16px 10px 48px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .mentions-badge {
+    background: #0e2a1f;
+    color: var(--green-dim);
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    border: 1px solid #1a4030;
+  }
+
+  .source-tag {
+    color: var(--muted);
+    font-size: 10px;
+    background: var(--border);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  /* snippet */
+  .snippet {
+    padding: 8px 16px 10px 48px;
+    color: #7a9ab0;
+    font-size: 11px;
+    line-height: 1.6;
+    border-top: 1px solid var(--border);
+  }
+
+  /* link */
+  .card-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #0a1520;
+    border-top: 1px solid var(--border);
+    color: var(--amber);
+    text-decoration: none;
+    font-size: 11px;
+    transition: background 0.15s;
+  }
+
+  .card-link:hover { background: #0f1e2d; }
+  .card-link::before { content: "→"; }
+
+  /* ── EMPTY / ERROR ── */
+  .empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--muted);
+  }
+
+  .empty-icon { font-size: 32px; margin-bottom: 12px; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 24px 20px 0;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">STOCK<span>SCAN</span></div>
+  <button class="scan-btn" id="scanBtn" onclick="startScan()">▶ RUN SCAN</button>
+</header>
+
+<div class="status-bar" id="statusBar">
+  <span><span class="dot" id="statusDot"></span><span id="statusText">Ready — press RUN SCAN</span></span>
+</div>
+
+<div id="progress">
+  <div class="spinner"></div>
+  <div class="progress-text">Scanning Reddit · this takes ~60s</div>
+</div>
+
+<div id="board"></div>
+
+<footer>NFA · for research only · data via Arctic Shift</footer>
+
+<script>
+async function startScan() {
+  const btn    = document.getElementById('scanBtn');
+  const prog   = document.getElementById('progress');
+  const board  = document.getElementById('board');
+  const dot    = document.getElementById('statusDot');
+  const status = document.getElementById('statusText');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Scanning…';
+  prog.style.display = 'block';
+  board.innerHTML = '';
+  dot.className = 'dot';
+  status.textContent = 'Scanning — please wait…';
+
+  try {
+    const res  = await fetch('/api/scan');
+    const data = await res.json();
+
+    prog.style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = '▶ RUN SCAN';
+    dot.className = 'dot live';
+    status.textContent = `${data.scanned_at} · ${data.total_posts} posts · ${data.total_comments} comments · last ${data.hours_back}h`;
+
+    renderBoard(data.results);
+  } catch(e) {
+    prog.style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = '▶ RUN SCAN';
+    status.textContent = 'Error — check connection';
+    board.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>Scan failed. Try again.</div>`;
+  }
+}
+
+function renderBoard(results) {
+  const board = document.getElementById('board');
+
+  if (!results || results.length === 0) {
+    board.innerHTML = `<div class="empty"><div class="empty-icon">📭</div>No bullish signals found in the last 24h.</div>`;
+    return;
+  }
+
+  const maxScore = results[0].score;
+
+  let html = `<div class="board-header">Bullish Momentum · Top ${results.length}</div>`;
+
+  results.forEach((item, i) => {
+    const pct      = Math.round((item.score / maxScore) * 100);
+    const sources  = item.sources.map(s => `<span class="source-tag">r/${s}</span>`).join(' ');
+    const snippet  = item.snippet ? `<div class="snippet">"${item.snippet}"</div>` : '';
+    const link     = item.link
+      ? `<a class="card-link" href="${item.link}" target="_blank">View Reddit thread</a>` : '';
+
+    html += `
+      <div class="card" style="animation-delay:${i * 60}ms">
+        <div class="card-top">
+          <div class="rank">#${item.rank}</div>
+          <div class="ticker">$${item.ticker}</div>
+          <div class="score-box">
+            <span class="score-num">${item.score}</span>
+            <span class="score-label">score</span>
+          </div>
+        </div>
+        <div class="momentum-wrap">
+          <div class="momentum-track">
+            <div class="momentum-fill" style="width:${pct}%"></div>
+          </div>
+        </div>
+        <div class="card-meta">
+          <span class="mentions-badge">${item.mentions} mention${item.mentions !== 1 ? 's' : ''}</span>
+          ${sources}
+        </div>
+        ${snippet}
+        ${link}
+      </div>`;
+  });
+
+  board.innerHTML = html;
+}
+</script>
+
+</body>
+</html>
