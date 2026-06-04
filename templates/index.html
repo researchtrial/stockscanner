@@ -30,13 +30,24 @@
     padding-bottom: 48px;
   }
 
+  .page-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
   header {
-    padding: 20px 16px 16px;
+    padding: 20px 0 16px;
     border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
     background: var(--bg);
     z-index: 10;
+  }
+
+  .header-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -68,10 +79,16 @@
   .scan-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
   .status-bar {
-    padding: 8px 16px;
+    padding: 8px 0;
     font-size: 10px;
     color: var(--muted);
     border-bottom: 1px solid var(--border);
+  }
+
+  .status-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 20px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -198,21 +215,26 @@
   .empty { text-align:center; padding:48px 16px; color:var(--muted); }
   .empty-icon { font-size:32px; margin-bottom:12px; }
 
-  footer { text-align:center; padding:24px 16px 0; font-size:10px; color:var(--muted); }
+  footer { text-align:center; padding:24px 16px 0; font-size:10px; color:var(--muted); max-width:680px; margin:0 auto; }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">MARKET<span>SCAN</span></div>
-  <button class="scan-btn" id="scanBtn" onclick="startScan()">▶ RUN SCAN</button>
+  <div class="header-inner">
+    <div class="logo">MARKET<span>SCAN</span></div>
+    <button class="scan-btn" id="scanBtn" onclick="startScan()">▶ RUN SCAN</button>
+  </div>
 </header>
 
 <div class="status-bar">
-  <div class="dot" id="statusDot"></div>
-  <span id="statusText">Ready — press RUN SCAN</span>
+  <div class="status-inner">
+    <div class="dot" id="statusDot"></div>
+    <span id="statusText">Ready — press RUN SCAN</span>
+  </div>
 </div>
 
+<div class="page-wrap">
 <div id="progress">
   <div class="spinner"></div>
   <div class="progress-text">Scanning Reddit · this takes ~60s</div>
@@ -220,6 +242,7 @@
 
 <div id="board"></div>
 
+</div><!-- /page-wrap -->
 <footer>NFA · for research only · data via Arctic Shift / Reddit</footer>
 
 <script>
